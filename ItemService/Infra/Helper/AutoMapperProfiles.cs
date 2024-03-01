@@ -10,5 +10,6 @@ public class AutoMapperProfiles : Profile
     {
         CreateMap<RestaurantCreateDto, Restaurant>();
         CreateMap<Restaurant, RestaurantReadDto>();
+        CreateMap<Item, ItemReadDto>();
     }
 }

@@ -3,6 +3,8 @@ using ItemService.Infra.Data;
 using ItemService.Infra.DTO;
 using ItemService.Infra.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
+using System.Text.Json;
 
 namespace ItemService.Infra.Repository;
 
@@ -61,28 +63,51 @@ public class ItemRepository : IItemRepository
 
     }
 
-    public Task<IReadOnlyList<RestaurantReadDto>> GetAllRestaurantsList()
+    public async Task<IReadOnlyList<RestaurantReadDto>> GetAllRestaurantsList()
     {
-        throw new NotImplementedException();
+        var listOfRestaurants = await _context.Restaurants.ToListAsync();
+
+        var mappedList = _mapper.Map<IReadOnlyList<Restaurant>, IReadOnlyList<RestaurantReadDto>>(listOfRestaurants);
+
+        return mappedList;
     }
 
-    public Task<IReadOnlyList<ItemReadDto>> GetItemsFromRestaurant(int restaurantId)
+    public async Task<IReadOnlyList<ItemReadDto>> GetItemsFromRestaurant(int restaurantId)
     {
-        throw new NotImplementedException();
+        if(restaurantId != null)
+        {
+            var listOfItemsFromRestaurant = _context.Items.Where(x => x.RestaurantId == restaurantId).ToList();
+
+            if(listOfItemsFromRestaurant is not null) return _mapper.Map<IReadOnlyList<Item>, IReadOnlyList<ItemReadDto>>(listOfItemsFromRestaurant);
+        }
+
+        return null;
     }
 
-    public Task<ItemReadDto> GetOnlyOneRestaurantById(int restaurantId, int id)
+    public async Task<ItemReadDto> GetOnlyOneItemById(int restaurantId, int id)
     {
-        throw new NotImplementedException();
+        var itemToRequest = await _context.Items.FirstAsync(x => x.RestaurantId == restaurantId && x.Id == id);
+        var restaurantOfItem = await _context.Restaurants.FirstOrDefaultAsync(x => x.Id == restaurantId);
+
+        var itemToReturn = new ItemReadDto
+        {
+            Name = itemToRequest.Name,
+            Price = itemToRequest.Price,
+            Restaurant = restaurantOfItem.Name
+        };
+
+        if (itemToReturn is not null) return itemToReturn;
+
+        return null;
     }
 
     public bool IsExternalRestaureantExisted(int externalRestaurantId)
     {
-        throw new NotImplementedException();
+        return _context.Restaurants.Any(x => x.ExternalId == externalRestaurantId);
     }
 
     public bool IsRestaureantExisted(int restaurantId)
     {
-        throw new NotImplementedException();
+        return _context.Restaurants.Any(x => x.Id == restaurantId);
     }
 }
