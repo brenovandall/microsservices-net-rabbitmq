@@ -6,5 +6,5 @@ public class ItemReadDto
 {
     public string Name { get; set; }
     public decimal Price { get; set; }
-    public int RestaurantId { get; set; }
+    public string Restaurant { get; set; }
 }

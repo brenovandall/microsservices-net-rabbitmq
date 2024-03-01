@@ -11,5 +11,5 @@ public interface IItemRepository
     public bool IsExternalRestaureantExisted(int externalRestaurantId);
     public Task<IReadOnlyList<ItemReadDto>> GetItemsFromRestaurant(int restaurantId);
     public Task<ItemReadDto> GetOnlyOneRestaurantById(int restaurantId, int id);
-    public Task<ItemReadDto> CreateRestaurant(int restaurantId, ItemCreateDto item);
+    public Task<ItemReadDto> CreateItem(int restaurantId, ItemCreateDto item);
 }

@@ -1,17 +1,64 @@
-﻿using ItemService.Infra.DTO;
+﻿using AutoMapper;
+using ItemService.Infra.Data;
+using ItemService.Infra.DTO;
+using ItemService.Infra.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ItemService.Infra.Repository;
 
 public class ItemRepository : IItemRepository
 {
-    public Task<RestaurantReadDto> CreateRestaurant(RestaurantCreateDto restaurant)
+    private readonly AppDbContext _context;
+    private readonly IMapper _mapper;
+    public ItemRepository(AppDbContext context, IMapper mapper)
     {
-        throw new NotImplementedException();
+        _context = context;
+        _mapper = mapper;
+    }
+    public async Task<RestaurantReadDto> CreateRestaurant(RestaurantCreateDto restaurant)
+    {
+        if(restaurant is not null)
+        {
+            var mappedRestaurant = _mapper.Map<RestaurantCreateDto, Restaurant>(restaurant);
+
+            if(mappedRestaurant is not null)
+            {
+                var restaurantToReturn = _mapper.Map<Restaurant, RestaurantReadDto>(mappedRestaurant);
+
+                return restaurantToReturn;
+            }
+
+            return null;
+        }
+
+        return null;
     }
 
-    public Task<ItemReadDto> CreateRestaurant(int restaurantId, ItemCreateDto item)
+    public async Task<ItemReadDto> CreateItem(int restaurantId, ItemCreateDto item)
     {
-        throw new NotImplementedException();
+        var idDoRestaurante = await _context.Restaurants.FirstOrDefaultAsync(item => item.Id == restaurantId);
+
+        var newItem = new Item
+        {
+            Name = item.Name,
+            Price = item.Price,
+            RestaurantId = item.RestaurantId,
+            Restaurant = idDoRestaurante
+        };
+
+        idDoRestaurante.ItemsOfRestaurant.Add(newItem);
+
+        var itemToReturn = new ItemReadDto
+        {
+            Name = newItem.Name,
+            Price = newItem.Price,
+            Restaurant = idDoRestaurante.Name
+        };
+
+        if(itemToReturn != null) return itemToReturn;
+
+        return null;
+
     }
 
     public Task<IReadOnlyList<RestaurantReadDto>> GetAllRestaurantsList()
