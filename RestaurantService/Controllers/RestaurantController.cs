@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RestaurantService.HttpClientServices;
+using RestaurantService.Infra.Data;
 using RestaurantService.Infra.DTO;
 using RestaurantService.Infra.Repository;
 
@@ -10,9 +13,13 @@ namespace RestaurantService.Controllers;
 public class RestaurantController : ControllerBase
 {
     private readonly IRestaurantRepository _restaurantRepository;
-    public RestaurantController(IRestaurantRepository restaurantRepository)
+    private IItemServiceHttpClient _itemServiceHttpClient;
+    private readonly ApplicationDbContext _context;
+    public RestaurantController(IRestaurantRepository restaurantRepository, IItemServiceHttpClient itemServiceHttpClient, ApplicationDbContext context)
     {
         _restaurantRepository = restaurantRepository;
+        _itemServiceHttpClient = itemServiceHttpClient;
+        _context = context;
     }
 
     [HttpGet]
@@ -47,7 +54,22 @@ public class RestaurantController : ControllerBase
         {
             var response = _restaurantRepository.CreateRestaurant(restaurant);
 
-            if(response is not null) return Ok(response);
+            var restaurantIdForTheRequest = await _context.Restaurants.FirstOrDefaultAsync(x => x.Name == response.Result.Name && x.Address == response.Result.Address && x.WebSiteUrl == response.Result.WebSiteUrl);
+
+            if (response is not null)
+            {
+                var objectToHttpRequest = new RestaurantHttpRequest
+                {
+                    Id = restaurantIdForTheRequest.Id,
+                    Name = response.Result.Name,
+                    Address = response.Result.Address,
+                    WebSiteUrl = response.Result.WebSiteUrl
+                };
+
+                _itemServiceHttpClient.SendRestaurantForItemServiceRestaurant(objectToHttpRequest);
+
+                return Ok(objectToHttpRequest);
+            };
 
             ModelState.AddModelError("Not create", "Something wrong");
             return NotFound(ModelState);

@@ -32,7 +32,7 @@ public class ItemController : ControllerBase
     {
         if (!_itemRepository.IsRestaureantExisted(restaurantId)) return NotFound();
 
-        var item = _itemRepository.GetOnlyOneItemById(restaurantId, id);
+        var item = _itemRepository.GetOnlyOneItemById(restaurantId, ItemId);
 
         if (item is not null) return Ok(item);
 
