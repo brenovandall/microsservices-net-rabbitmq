@@ -49,6 +49,7 @@ public class ItemRepository : IItemRepository
         };
 
         idDoRestaurante.ItemsOfRestaurant.Add(newItem);
+        _context.SaveChanges();
 
         var itemToReturn = new ItemReadDto
         {
