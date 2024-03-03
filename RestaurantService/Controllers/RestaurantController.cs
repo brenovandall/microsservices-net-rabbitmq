@@ -5,6 +5,7 @@ using RestaurantService.HttpClientServices;
 using RestaurantService.Infra.Data;
 using RestaurantService.Infra.DTO;
 using RestaurantService.Infra.Repository;
+using RestaurantService.RabbitMQClient;
 
 namespace RestaurantService.Controllers;
 
@@ -15,11 +16,13 @@ public class RestaurantController : ControllerBase
     private readonly IRestaurantRepository _restaurantRepository;
     private IItemServiceHttpClient _itemServiceHttpClient;
     private readonly ApplicationDbContext _context;
-    public RestaurantController(IRestaurantRepository restaurantRepository, IItemServiceHttpClient itemServiceHttpClient, ApplicationDbContext context)
+    private IRabbitMqClient _rabbitMqClient;
+    public RestaurantController(IRestaurantRepository restaurantRepository, IItemServiceHttpClient itemServiceHttpClient, ApplicationDbContext context, IRabbitMqClient rabbitMqClient)
     {
         _restaurantRepository = restaurantRepository;
         _itemServiceHttpClient = itemServiceHttpClient;
         _context = context;
+        _rabbitMqClient = rabbitMqClient;
     }
 
     [HttpGet]
@@ -66,7 +69,7 @@ public class RestaurantController : ControllerBase
                     WebSiteUrl = response.Result.WebSiteUrl
                 };
 
-                _itemServiceHttpClient.SendRestaurantForItemServiceRestaurant(objectToHttpRequest);
+                _rabbitMqClient.PublishRestaurantAtRabbitMqQueue(objectToHttpRequest);
 
                 return Ok(objectToHttpRequest);
             };

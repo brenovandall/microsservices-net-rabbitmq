@@ -10,6 +10,7 @@ public class AutoMapperProfiles : Profile
     {
         CreateMap<RestaurantCreateDto, Restaurant>();
         CreateMap<Restaurant, RestaurantReadDto>();
+        CreateMap<Restaurant, RestaurantCreateDto>();
         CreateMap<Item, ItemReadDto>();
     }
 }

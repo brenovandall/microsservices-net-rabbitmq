@@ -3,6 +3,7 @@ using RestaurantService.Extensions;
 using RestaurantService.HttpClientServices;
 using RestaurantService.Infra.Data;
 using RestaurantService.Infra.Repository;
+using RestaurantService.RabbitMQClient;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt => opt.UseMySql(database
 builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddHttpClient<IItemServiceHttpClient, ItemServiceHttpClient>();
+builder.Services.AddSingleton<IRabbitMqClient, RabbitMqClient>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -29,7 +31,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

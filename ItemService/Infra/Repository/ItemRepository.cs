@@ -25,6 +25,9 @@ public class ItemRepository : IItemRepository
 
             if(mappedRestaurant is not null)
             {
+                await _context.Restaurants.AddAsync(mappedRestaurant);
+                await _context.SaveChangesAsync();
+
                 var restaurantToReturn = _mapper.Map<Restaurant, RestaurantReadDto>(mappedRestaurant);
 
                 return restaurantToReturn;

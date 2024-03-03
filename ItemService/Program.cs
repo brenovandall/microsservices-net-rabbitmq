@@ -1,5 +1,7 @@
+using ItemService.EventProcessor;
 using ItemService.Infra.Data;
 using ItemService.Infra.Repository;
+using ItemService.RabbitMQClient;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,8 @@ var applicationConnectionString = builder.Configuration.GetConnectionString("dat
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseMySql(applicationConnectionString, ServerVersion.AutoDetect(applicationConnectionString)));
 
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
+builder.Services.AddHostedService<RabbitMqSubscriber>();
+builder.Services.AddSingleton<IExecuteEvent, ExecuteEvent>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddControllers();
@@ -27,17 +31,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
 
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//    db.Database.Migrate();
+//}
 
 app.Run();
