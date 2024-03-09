@@ -16,6 +16,6 @@ public class ItemServiceHttpClient : IItemServiceHttpClient
     {
         var httpContent = new StringContent(JsonSerializer.Serialize(restaurantHttpRequest),Encoding.UTF8, "application/json");
 
-        await _httpClient.PostAsync("https://localhost:7105/api/item/restaurant/restaurants/add/new", httpContent);
+        await _httpClient.PostAsync("http://item-service/api/item/restaurant/restaurants/add/new", httpContent);
     }
 }

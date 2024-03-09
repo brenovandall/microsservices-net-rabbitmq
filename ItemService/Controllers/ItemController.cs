@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace ItemService.Controllers;
 
-[Route("api/item/restaurant/{restaurantId}/[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class ItemController : ControllerBase
 {
@@ -40,6 +40,7 @@ public class ItemController : ControllerBase
     }
 
     [HttpPost]
+    [Route("restaurant/restaurants/add/new")]
     public async Task<ActionResult<ItemReadDto>> CreateItemForRestaurant(int restaurantId, ItemCreateDto item)
     {
         if (item is not null && _itemRepository.IsRestaureantExisted(restaurantId)) return Ok(_itemRepository.CreateItem(restaurantId, item));

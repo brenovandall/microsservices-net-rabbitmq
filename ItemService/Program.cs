@@ -6,6 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Program>()
+                              .UseUrls("http://0.0.0.0:80"); // Configura para escutar em todas as interfaces IPv4 na porta 80
+                });
+
 // Add services to the container.
 
 var applicationConnectionString = builder.Configuration.GetConnectionString("databaseConnectionStringRestaurantServiceApi");
@@ -38,10 +45,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-//    db.Database.Migrate();
-//}
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
 
 app.Run();

@@ -8,6 +8,13 @@ using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Program>()
+                              .UseUrls("http://0.0.0.0:80"); // Configura para escutar em todas as interfaces IPv4 na porta 80
+                });
+
 // Add services to the container.
 builder.Services.AddControllers();
 var databaseConnectionString = builder.Configuration.GetConnectionString("databaseConnectionStringRestaurantServiceApi");
@@ -36,5 +43,11 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
 
 app.Run();
